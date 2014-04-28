@@ -26,18 +26,19 @@ object Sample {
   }
 }
 
+
 object Foo extends Module[Foo] {
   override def apply(): Foo = new DefaultFoo
 }
 
 trait Foo {
-  def fooCall()
+  def fooCall():String
 }
 
 class DefaultFoo extends Foo {
   override def fooCall() = {
     val bar = require(Bar)
-    "default-foo" + bar.barCall()
+    "default-foo" +" : "+ bar.barCall()
   }
 }
 
@@ -46,13 +47,13 @@ object Bar extends Module[Bar] {
 }
 
 trait Bar {
-  def barCall()
+  def barCall():String
 }
 
 class DefaultBar extends Bar {
-  override def barCall() = "default-bar"
+  override def barCall(): String = "default-bar"
 }
 
 class MockBar extends Bar {
-  override def barCall(): Unit = "mock-bar"
+  override def barCall(): String = "mock-bar"
 }
