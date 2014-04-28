@@ -10,7 +10,7 @@ object Sample {
   def main(args: Array[String]): Unit = {
     {
       val foo = require(Foo)
-      println(foo.fooCall())
+      println(foo.fooCall()) // default-foo : default-bar
     }
 
     require4s.flushAll()
@@ -20,7 +20,7 @@ object Sample {
 
     {
       val foo = require(Foo)
-      println(foo.fooCall())
+      println(foo.fooCall()) // default-foo : mock-bar
     }
 
   }
