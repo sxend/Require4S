@@ -15,7 +15,7 @@ package object require4s {
     var alias = initAlias()
     def initCache() = Memo.immutableHashMapMemo {
       module: Module[_] => {
-        alias.getOrElse(module, module).apply()
+        alias.getOrElse(module, module).export
       }
     }
     var cache = initCache()
