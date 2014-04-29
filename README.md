@@ -57,3 +57,8 @@ class MockBar extends Bar {
   override def barCall(): String = "mock-bar"
 }
 ```
+
+LICENSE
+=======
+
+MIT
