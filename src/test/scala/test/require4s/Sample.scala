@@ -13,8 +13,8 @@ object Sample {
       println(foo.fooCall()) // default-foo : default-bar
     }
 
-    require4s.flushAll()
-    require4s.alias(Bar, Module.export[Bar](new MockBar))
+    require.flushAll()
+    require.alias(Bar, Module.export[Bar](new MockBar))
 
     {
       val foo = require(Foo)
