@@ -12,9 +12,8 @@ object Sample {
       val foo = require(Foo)
       println(foo.fooCall()) // default-foo : default-bar
     }
-
-    require.flushAll()
-    require.alias(Bar, Module.export[Bar](new MockBar))
+    require.flush()
+    require.define(Module.wrap(Bar, new MockBar))
 
     {
       val foo = require(Foo)
@@ -24,9 +23,8 @@ object Sample {
   }
 }
 
-
-object Foo extends Module[Foo] {
-  override def export = new DefaultFoo
+case object Foo extends Module[Foo] {
+  override def export: Foo = new DefaultFoo
 }
 
 trait Foo {
@@ -40,8 +38,8 @@ class DefaultFoo extends Foo {
   }
 }
 
-object Bar extends Module[Bar] {
-  override def export = new DefaultBar
+case object Bar extends Module[Bar] {
+  override def export: Bar = new DefaultBar
 }
 
 trait Bar {
