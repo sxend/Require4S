@@ -8,38 +8,34 @@ import require4s._
 object Sample {
 
   def main(args: Array[String]): Unit = {
+    require.define[Bar, DefaultBar]
+
     {
-      val foo = require(Foo)
+      val foo = require[Foo]
       println(foo.fooCall()) // default-foo : default-bar
     }
     require.flush()
-    require.define(Module.wrap(Bar, new MockBar))
+    require.define[Bar, MockBar]
 
     {
-      val foo = require(Foo)
+      val foo = require[Foo]
       println(foo.fooCall()) // default-foo : mock-bar
     }
 
   }
 }
 
-case object Foo extends Module[Foo] {
-  override def export: Foo = new DefaultFoo
-}
 
 trait Foo {
   def fooCall(): String
 }
 
+@Module(classOf[Foo])
 class DefaultFoo extends Foo {
   override def fooCall() = {
-    val bar = require(Bar)
+    val bar = require[Bar]
     "default-foo" + " : " + bar.barCall()
   }
-}
-
-case object Bar extends Module[Bar] {
-  override def export: Bar = new DefaultBar
 }
 
 trait Bar {
