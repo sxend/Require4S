@@ -1,6 +1,6 @@
 import com.google.inject.{AbstractModule, Guice}
 import org.reflections._
-import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
+import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util._
 import scala.reflect.ClassTag
 import scala.collection.JavaConversions._
@@ -14,14 +14,12 @@ package object require4s {
   lazy val require: Require = initRequire()
 
   private def initRequire[A]() = {
-    def initInjector() = {
+    def initInjector(basePackage: String = "") = {
       Guice.createInjector(new AbstractModule {
         override def configure(): Unit = {
           val reflections = new Reflections(new ConfigurationBuilder()
-            .addUrls(ClasspathHelper.forPackage("test"))
-            .setScanners(new ResourcesScanner(),
-              new TypeAnnotationsScanner(),
-              new SubTypesScanner()))
+            .addUrls(ClasspathHelper.forPackage(basePackage))
+            .setScanners(new TypeAnnotationsScanner()))
           val binder = this.binder()
           reflections
             .getTypesAnnotatedWith(classOf[Module])
@@ -45,8 +43,8 @@ package object require4s {
         })
       }
 
-      override def flush() = {
-        injector = initInjector()
+      override def refresh(basePackage: String) = {
+        injector = initInjector(basePackage)
       }
     }
   }
@@ -56,7 +54,7 @@ package object require4s {
 
     def define[A: ClassTag, B <: A : ClassTag](implicit from: ClassTag[A], to: ClassTag[B]): Unit
 
-    def flush(): Unit
+    def refresh(basePackage: String = ""): Unit
   }
 
 }

@@ -1,13 +1,6 @@
 package require4s;
 
-import com.google.inject.*;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
-import java.lang.annotation.Annotation;
-import java.util.Set;
+import com.google.inject.Binder;
 
 /**
  * Created by sxend on 14/05/03.

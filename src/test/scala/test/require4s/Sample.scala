@@ -14,8 +14,8 @@ object Sample {
       val foo = require[Foo]
       println(foo.fooCall()) // default-foo : default-bar
     }
-    require.flush()
-    require.define[Bar, MockBar]
+    require.refresh() // binding and instances all-refreshed
+    require.define[Bar, MockBar] // Class Foo binding overridden
 
     {
       val foo = require[Foo]
@@ -24,7 +24,6 @@ object Sample {
 
   }
 }
-
 
 trait Foo {
   def fooCall(): String
