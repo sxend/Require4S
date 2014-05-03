@@ -19,14 +19,12 @@ package object require4s {
     def initInjector(basePackage: String = "") = {
       module = new AbstractModule {
         override def configure(): Unit = {
-          val reflections = new Reflections(new ConfigurationBuilder()
+          new Reflections(new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forPackage(basePackage))
             .setScanners(new TypeAnnotationsScanner()))
-          val binder = this.binder()
-          reflections
             .getTypesAnnotatedWith(classOf[Module])
             .foreach(m => {
-            ModuleBinder.bind[A](binder, m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]], m.asInstanceOf[Class[A]])
+            bind[A](m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]]).to(m.asInstanceOf[Class[A]])
           })
         }
       }
@@ -34,14 +32,14 @@ package object require4s {
     }
     var injector = initInjector()
     new Require {
-      override def apply[A: ClassTag](implicit tag: ClassTag[A]): A = {
-        injector.getInstance(tag.runtimeClass.asInstanceOf[Class[A]])
+      override def apply[M: ClassTag](implicit tag: ClassTag[M]): M = {
+        injector.getInstance(tag.runtimeClass.asInstanceOf[Class[M]])
       }
 
-      override def define[A: ClassTag, B <: A : ClassTag](implicit from: ClassTag[A], to: ClassTag[B]): Unit = {
+      override def define[M: ClassTag, E <: M : ClassTag](implicit from: ClassTag[M], to: ClassTag[E]): Unit = {
         injector = Guice.createInjector(Modules.`override`(module).`with`(new AbstractModule {
           override def configure(): Unit = {
-            bind[A](from.runtimeClass.asInstanceOf[Class[A]]).to(to.runtimeClass.asInstanceOf[Class[B]])
+            bind[M](from.runtimeClass.asInstanceOf[Class[M]]).to(to.runtimeClass.asInstanceOf[Class[E]])
           }
         }))
       }
