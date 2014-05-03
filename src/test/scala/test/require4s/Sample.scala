@@ -8,8 +8,6 @@ import require4s._
 object Sample {
 
   def main(args: Array[String]): Unit = {
-    require.define[Bar, DefaultBar]
-
     {
       val foo = require[Foo]
       println(foo.fooCall()) // default-foo : default-bar
@@ -41,6 +39,7 @@ trait Bar {
   def barCall(): String
 }
 
+@Module(classOf[Bar])
 class DefaultBar extends Bar {
   override def barCall(): String = "default-bar"
 }

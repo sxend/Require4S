@@ -1,3 +1,4 @@
+import com.google.inject.util.Modules
 import com.google.inject.{AbstractModule, Guice}
 import org.reflections._
 import org.reflections.scanners.TypeAnnotationsScanner
@@ -14,8 +15,9 @@ package object require4s {
   lazy val require: Require = initRequire()
 
   private def initRequire[A]() = {
+    var module: com.google.inject.Module = null
     def initInjector(basePackage: String = "") = {
-      Guice.createInjector(new AbstractModule {
+      module = new AbstractModule {
         override def configure(): Unit = {
           val reflections = new Reflections(new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forPackage(basePackage))
@@ -27,7 +29,8 @@ package object require4s {
             ModuleBinder.bind[A](binder, m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]], m.asInstanceOf[Class[A]])
           })
         }
-      })
+      }
+      Guice.createInjector(module)
     }
     var injector = initInjector()
     new Require {
@@ -36,11 +39,11 @@ package object require4s {
       }
 
       override def define[A: ClassTag, B <: A : ClassTag](implicit from: ClassTag[A], to: ClassTag[B]): Unit = {
-        injector = injector.createChildInjector(new AbstractModule {
+        injector = Guice.createInjector(Modules.`override`(module).`with`(new AbstractModule {
           override def configure(): Unit = {
             bind[A](from.runtimeClass.asInstanceOf[Class[A]]).to(to.runtimeClass.asInstanceOf[Class[B]])
           }
-        })
+        }))
       }
 
       override def refresh(basePackage: String) = {
