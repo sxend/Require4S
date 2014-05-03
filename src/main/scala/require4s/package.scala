@@ -19,11 +19,9 @@ package object require4s {
     def initInjector(basePackage: String = "") = {
       module = new AbstractModule {
         override def configure(): Unit = {
-          val reflections = new Reflections(new ConfigurationBuilder()
+          new Reflections(new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forPackage(basePackage))
             .setScanners(new TypeAnnotationsScanner()))
-          val binder = this.binder()
-          reflections
             .getTypesAnnotatedWith(classOf[Module])
             .foreach(m => {
             bind[A](m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]]).to(m.asInstanceOf[Class[A]])
