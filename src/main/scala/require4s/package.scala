@@ -13,7 +13,7 @@ package object require4s {
 
   lazy val require: Require = initRequire()
 
-  private def initRequire() = {
+  private def initRequire[A]() = {
     def initInjector() = {
       Guice.createInjector(new AbstractModule {
         override def configure(): Unit = {
@@ -22,10 +22,11 @@ package object require4s {
             .setScanners(new ResourcesScanner(),
               new TypeAnnotationsScanner(),
               new SubTypesScanner()))
+          val binder = this.binder()
           reflections
             .getTypesAnnotatedWith(classOf[Module])
             .foreach(m => {
-            bind(m.getAnnotation(classOf[Module]).value()).to(m)
+            ModuleBinder.bind[A](binder, m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]], m.asInstanceOf[Class[A]])
           })
         }
       })
