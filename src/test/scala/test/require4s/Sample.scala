@@ -3,7 +3,7 @@ package test.require4s
 import require4s._
 
 /**
- * Created by sxend on 14/04/29.
+ * Updated by sxend on 14/05/03.
  */
 object Sample {
 
