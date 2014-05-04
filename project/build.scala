@@ -12,10 +12,9 @@ object Require4SBuild extends Build {
     libraryDependencies ++= Seq(
       "com.google.inject" % "guice" % "3.0",
       "org.slf4j" % "slf4j-api" % "1.7.5",
-      "org.reflections" % "reflections" % "0.9.7",
+      "org.reflections" % "reflections" % "0.9.9-RC1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.scalatest" %% "scalatest" % "2.1.4" % "test",
-      "org.scalaz" %% "scalaz-core" % "7.0.6"
+      "org.scalatest" %% "scalatest" % "2.1.4" % "test"
     )
   ))
 

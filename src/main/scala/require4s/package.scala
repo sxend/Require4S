@@ -1,5 +1,5 @@
 import com.google.inject.util.Modules
-import com.google.inject.{AbstractModule, Guice}
+import com.google.inject.{Stage, AbstractModule, Guice}
 import org.reflections._
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util._
@@ -15,37 +15,36 @@ package object require4s {
   lazy val require: Require = initRequire()
 
   private def initRequire[A]() = {
-    var module: com.google.inject.Module = null
-    def initInjector(basePackage: String = "") = {
-      module = new AbstractModule {
-        override def configure(): Unit = {
-          new Reflections(new ConfigurationBuilder()
-            .addUrls(ClasspathHelper.forPackage(basePackage))
-            .setScanners(new TypeAnnotationsScanner()))
-            .getTypesAnnotatedWith(classOf[Module])
-            .foreach(m => {
-            bind[A](m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]]).to(m.asInstanceOf[Class[A]])
-          })
-        }
+    val module: com.google.inject.Module = new AbstractModule {
+      override def configure(): Unit = {
+        new Reflections(new ConfigurationBuilder()
+          .addUrls(ClasspathHelper.forPackage(""))
+          .setScanners(new TypeAnnotationsScanner()))
+          .getTypesAnnotatedWith(classOf[Module])
+          .foreach(m => {
+          bind[A](m.getAnnotation(classOf[Module]).value().asInstanceOf[Class[A]]).to(m.asInstanceOf[Class[A]])
+        })
       }
-      Guice.createInjector(module)
     }
-    var injector = initInjector()
+    def initInjector(module: com.google.inject.Module) = {
+      Guice.createInjector(Stage.PRODUCTION, module)
+    }
+    var injector = initInjector(module)
     new Require {
       override def apply[M: ClassTag](implicit tag: ClassTag[M]): M = {
         injector.getInstance(tag.runtimeClass.asInstanceOf[Class[M]])
       }
 
       override def define[M: ClassTag, E <: M : ClassTag](implicit from: ClassTag[M], to: ClassTag[E]): Unit = {
-        injector = Guice.createInjector(Modules.`override`(module).`with`(new AbstractModule {
+        injector = initInjector(Modules.`override`(module).`with`(new AbstractModule {
           override def configure(): Unit = {
             bind[M](from.runtimeClass.asInstanceOf[Class[M]]).to(to.runtimeClass.asInstanceOf[Class[E]])
           }
         }))
       }
 
-      override def refresh(basePackage: String) = {
-        injector = initInjector(basePackage)
+      override def refresh() = {
+        injector = initInjector(module)
       }
     }
   }
@@ -55,7 +54,7 @@ package object require4s {
 
     def define[A: ClassTag, B <: A : ClassTag](implicit from: ClassTag[A], to: ClassTag[B]): Unit
 
-    def refresh(basePackage: String = ""): Unit
+    def refresh(): Unit
   }
 
 }
