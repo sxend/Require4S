@@ -13,7 +13,9 @@ object Sample {
       println(foo.fooCall()) // default-foo : default-bar
     }
     require.refresh() // binding and instances all-refreshed
-    require.define[Bar, MockBar] // Class Foo binding overridden
+    val mockBarDef = require.prepare[Bar, MockBar]
+    require.defineAll(mockBarDef) // Class Foo binding overridden
+    // require.define[Bar, MockBar] // Class Foo binding overridden
 
     {
       val foo = require[Foo]
